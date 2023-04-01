@@ -1,45 +1,56 @@
 import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
+import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
 
 class ProdutoDao {
   List<Produto> produtosEstoque = [];
-  String adicionar(Produto produto) {
+
+  String adicionar(Produto produto, Usuario usuarioCadastro) {
     try {
       var existe = false;
-      for (var i = 0; i < produtosEstoque.length; i++) {
-        var produtoEstoque = produtosEstoque[i];
-        if (produtoEstoque.nomeGet == produto.nomeGet) {
-          produtoEstoque.quantidadeEstoqueSet = produto.quantidadeEstoqueGet +
-              produtoEstoque.quantidadeEstoqueGet;
-          existe = true;
-          break;
+      if (usuarioCadastro.tipoUsuario == 'gerenciador') {
+        for (var i = 0; i < produtosEstoque.length; i++) {
+          var produtoEstoque = produtosEstoque[i];
+          if (produtoEstoque.nome == produto.nome) {
+            produtoEstoque.quantidadeEstoque =
+                produto.quantidadeEstoque + produtoEstoque.quantidadeEstoque;
+            produtoEstoque.preco = produto.preco;
+            produtoEstoque.quantidadeMaxima = produto.quantidadeMaxima;
+            produtoEstoque.quantidadeMinima = produto.quantidadeMinima;
+            existe = true;
+            break;
+          }
         }
+        if (!existe) {
+          produtosEstoque.add(produto);
+        }
+        return "Produto cadastrado com sucesso!";
       }
-      if (!existe) {
-        produtosEstoque.add(produto);
-      }
-      return "Produto cadastrado com sucesso!";
+      return "O usuário não pode cadastrar produto.";
     } catch (e) {
-      throw Exception('Error ao cadastrar produto');
+      throw Exception('Erro ao cadastrar produto.');
     }
   }
 
-  String alterar(Produto produto) {
+  String alterar(Produto produto, Usuario usuarioAlteracao) {
     bool produtoEncontrado = false;
     try {
-      for (var i = 0; i < produtosEstoque.length; i++) {
-        if (produtosEstoque[i].idGet == produto.idGet) {
-          produtosEstoque[i] = produto;
-          produtoEncontrado = true;
-          break;
+      if (usuarioAlteracao.tipoUsuario == 'gerenciador') {
+        for (var i = 0; i < produtosEstoque.length; i++) {
+          if (produtosEstoque[i].id == produto.id) {
+            produtosEstoque[i] = produto;
+            produtoEncontrado = true;
+            break;
+          }
+        }
+        if (produtoEncontrado) {
+          return "Produto alterado com sucesso!";
+        } else {
+          return "Produto não encontrado";
         }
       }
-      if (produtoEncontrado) {
-        return "Produto alterado com sucesso!";
-      } else {
-        return "Produto não encontrado";
-      }
+      return "Usuário não pode alterar o produto!";
     } catch (e) {
-      throw Exception('Error ao alterar produto');
+      throw Exception('Erro ao alterar produto');
     }
   }
 
@@ -50,19 +61,22 @@ class ProdutoDao {
       else
         return produtosEstoque.toString();
     } catch (e) {
-      throw Exception('Error ao listar produtos');
+      throw Exception('Erro ao listar produtos');
     }
   }
 
-  String excluir(int id) {
+  String excluir(int id, Usuario usuarioExclusao) {
     Produto? produtoExcluir = getProduto(id);
     try {
-      if (produtoExcluir != null) {
-        produtosEstoque.remove(produtoExcluir);
-        return "Produto excluido com sucesso!";
-      } else {
-        return "Produto não encontrado";
+      if (usuarioExclusao.tipoUsuario == 'gerenciador') {
+        if (produtoExcluir != null) {
+          produtosEstoque.remove(produtoExcluir);
+          return "Produto excluido com sucesso!";
+        } else {
+          return "Produto não encontrado";
+        }
       }
+      return "Usuário não pode excluir produto!";
     } catch (e) {
       throw Exception('Erro ao excluir');
     }
@@ -70,8 +84,7 @@ class ProdutoDao {
 
   Produto? getProduto(int id) {
     for (var i = 0; i < produtosEstoque.length; i++) {
-      if (produtosEstoque[i].idGet == id) {
-        produtosEstoque.remove(produtosEstoque[i]);
+      if (produtosEstoque[i].id == id) {
         return produtosEstoque[i];
         break;
       }
@@ -87,17 +100,10 @@ class ProdutoDao {
     return valor;
   }
 
-  String? estoqueProdutoBaixo(Produto produto) {
-    if (produto.quantidadeEstoqueGet <= produto.quantidadeMinimaGet) {
-      return "Estoque menor que o limite minimo permitido!";
+  bool temQuantidadeNecessaria(int quantidadeVenda, int quantidadeEstoque) {
+    if (quantidadeVenda >= quantidadeEstoque) {
+      return true;
     }
-    return "Estoque do limite minimo permitido!";
-  }
-
-  String? estoqueProdutoAlto(Produto produto) {
-    if (produto.quantidadeEstoqueGet >= produto.quantidadeMinimaGet) {
-      return "Estoque maior que o limite máximo permitido!";
-    }
-    return "Estoque menor que o limite máximo permitido!";
+    return false;
   }
 }
