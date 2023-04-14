@@ -2,12 +2,20 @@ import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/venda.dart';
 
 class ItemVenda {
-  dynamic id;
-  Produto produto;
-  int quantidadeProduto;
+  final dynamic _id;
+  final Produto _produto;
+  final int _quantidadeProduto;
 
   ItemVenda(
-      {this.id,
-      required this.produto,
-      required this.quantidadeProduto});
+      {dynamic id, required Produto produto, required int quantidadeProduto})
+      : _id = id,
+        _produto = produto,
+        _quantidadeProduto = quantidadeProduto;
+
+  dynamic get id => _id;
+
+  Produto get produto => _produto;
+
+  int get quantidadeProduto => _quantidadeProduto;
 }
+

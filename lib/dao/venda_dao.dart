@@ -29,10 +29,17 @@ class VendaDao {
   bool podeCadastrarVenda(List<ItemVenda> itensVenda) {
     for (var i = 0; i < itensVenda.length; i++) {
       var itemVenda = itensVenda[i];
-      if (produtoDao.temQuantidadeNecessaria(
+      if (temQuantidadeNecessaria(
           itemVenda.quantidadeProduto, itemVenda.produto.quantidadeEstoque)) {
         return true;
       }
+    }
+    return false;
+  }
+
+    bool temQuantidadeNecessaria(int quantidadeVenda, int quantidadeEstoque) {
+    if (quantidadeVenda >= quantidadeEstoque) {
+      return true;
     }
     return false;
   }

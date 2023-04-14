@@ -1,10 +1,11 @@
+import 'package:sistema_gerenciamento_estoque/entidade/gerenciador.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
 
 class UsuarioDao {
   List<Usuario> usuarios = [];
 
-  bool permissaoUsuario(Usuario usuario) {
-    if (usuario.tipoUsuario == 'gerenciador') {
+  bool permissaoUsuarioGerenciador(Usuario usuario) {
+    if (usuario.getPermissao() == 'gerenciador') {
       return true;
     }
     return false;
@@ -33,7 +34,6 @@ class UsuarioDao {
       throw Exception('Erro ao cadastrar usuário');
     }
   }
-
 
   Usuario? getUsuario(int id) {
     for (var i = 0; i < usuarios.length; i++) {

@@ -31,4 +31,16 @@ class ControleEstoqueDao {
       return false;
     }
   }
+
+    int quantidadeTotalEstoque(List<Produto> produtos) {
+    int quantidadeTotal = 0;
+    try {
+      produtos.forEach((element) {
+        quantidadeTotal += element.quantidadeEstoque;
+      });
+      return quantidadeTotal;
+    } catch (e) {
+      throw Exception('Erro ao listar quantiadade total de produtos');
+    }
+  }
 }

@@ -7,13 +7,12 @@ import 'controle_estoque_dao.dart';
 
 class ProdutoDao {
   List<Produto> produtosEstoque = [];
-  ControleEstoqueDao controleEstoqueDao;
+  ControleEstoqueDao controleEstoqueDao = ControleEstoqueDao();
 
-  String adicionar(Produto produto, Usuario usuarioCadastro) {
+  String? adicionar(Produto produto, Usuario usuarioCadastro) {
     try {
       var existe = false;
-      controleEstoqueDao.limiteMaximoAtingido(produto.quantidadeMinima, produto.quantidadeEstoque);
-      if (usuarioCadastro.tipoUsuario == 'gerenciador') {
+      if (usuarioCadastro.getPermissao() == 'gerenciador') {
         for (var i = 0; i < produtosEstoque.length; i++) {
           var produtoEstoque = produtosEstoque[i];
           if (produtoEstoque.nome == produto.nome) {
@@ -37,11 +36,10 @@ class ProdutoDao {
     }
   }
 
-  String alterar(Produto produto, Usuario usuarioAlteracao) {
+  String? alterar(Produto produto, Usuario usuarioAlteracao) {
     bool produtoEncontrado = false;
     try {
-      controleEstoqueDao.limiteMaximoAtingido(produto.quantidadeMinima, produto.quantidadeEstoque);
-      if (usuarioAlteracao.tipoUsuario == 'gerenciador') {
+      if (usuarioAlteracao.getPermissao() == 'gerenciador') {
         for (var i = 0; i < produtosEstoque.length; i++) {
           if (produtosEstoque[i].id == produto.id) {
             produtosEstoque[i] = produto;
@@ -72,21 +70,14 @@ class ProdutoDao {
     }
   }
 
-    int quantidadeTotalEstoque() {
-      int quantidadeTotal = 0;
-    try {
-      produtosEstoque.forEach((element) {quantidadeTotal += element.quantidadeEstoque});
-      return quantidadeTotal;
-    } catch (e) {
-      throw Exception('Erro ao listar quantiadade total de produtos');
-    }
+  List<Produto> getAll() {
+    return produtosEstoque;
   }
-
 
   String excluir(int id, Usuario usuarioExclusao) {
     Produto? produtoExcluir = getProduto(id);
     try {
-      if (usuarioExclusao.tipoUsuario == 'gerenciador') {
+      if (usuarioExclusao.getPermissao() == 'gerenciador') {
         if (produtoExcluir != null) {
           produtosEstoque.remove(produtoExcluir);
           return "Produto excluido com sucesso!";
@@ -116,12 +107,5 @@ class ProdutoDao {
       valor += produtosEstoque[i].valorProdutoEstoque();
     }
     return valor;
-  }
-
-  bool temQuantidadeNecessaria(int quantidadeVenda, int quantidadeEstoque) {
-    if (quantidadeVenda >= quantidadeEstoque) {
-      return true;
-    }
-    return false;
   }
 }
