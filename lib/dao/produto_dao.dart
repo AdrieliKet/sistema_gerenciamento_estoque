@@ -1,12 +1,18 @@
+import 'dart:ffi';
+
 import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
 
+import 'controle_estoque_dao.dart';
+
 class ProdutoDao {
   List<Produto> produtosEstoque = [];
+  ControleEstoqueDao controleEstoqueDao;
 
   String adicionar(Produto produto, Usuario usuarioCadastro) {
     try {
       var existe = false;
+      controleEstoqueDao.limiteMaximoAtingido(produto.quantidadeMinima, produto.quantidadeEstoque);
       if (usuarioCadastro.tipoUsuario == 'gerenciador') {
         for (var i = 0; i < produtosEstoque.length; i++) {
           var produtoEstoque = produtosEstoque[i];
@@ -34,6 +40,7 @@ class ProdutoDao {
   String alterar(Produto produto, Usuario usuarioAlteracao) {
     bool produtoEncontrado = false;
     try {
+      controleEstoqueDao.limiteMaximoAtingido(produto.quantidadeMinima, produto.quantidadeEstoque);
       if (usuarioAlteracao.tipoUsuario == 'gerenciador') {
         for (var i = 0; i < produtosEstoque.length; i++) {
           if (produtosEstoque[i].id == produto.id) {
@@ -64,6 +71,17 @@ class ProdutoDao {
       throw Exception('Erro ao listar produtos');
     }
   }
+
+    int quantidadeTotalEstoque() {
+      int quantidadeTotal = 0;
+    try {
+      produtosEstoque.forEach((element) {quantidadeTotal += element.quantidadeEstoque});
+      return quantidadeTotal;
+    } catch (e) {
+      throw Exception('Erro ao listar quantiadade total de produtos');
+    }
+  }
+
 
   String excluir(int id, Usuario usuarioExclusao) {
     Produto? produtoExcluir = getProduto(id);

@@ -8,14 +8,12 @@ class ControleEstoqueDao {
     if (limiteMinimoAtingido(quantidadeMinima, quantidadeEstoque)) {
       return "Estoque menor que o limite minimo permitido!";
     }
-    return "Estoque do limite minimo permitido!";
   }
 
   String? estoqueProdutoAlto(int quantidadeMaxima, int quantidadeEstoque) {
     if (limiteMaximoAtingido(quantidadeMaxima, quantidadeEstoque)) {
       return "Estoque maior que o limite máximo permitido!";
     }
-    return "Estoque do limite minimo permitido!";
   }
 
   bool limiteMinimoAtingido(int quantidadeMinima, int quantidadeEstoque) {

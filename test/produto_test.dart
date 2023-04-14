@@ -10,16 +10,16 @@ import 'package:sistema_gerenciamento_estoque/entidade/venda.dart';
 
 import 'package:sistema_gerenciamento_estoque/main.dart';
 
-//1 - Só é permitido a venda de produtos que tem estoque. ok
-//2 - Todo produto deve possuir um estoque mínimo, no qual, quando chegar neste mínimno o gerente deve ser informado. ok
-//3 - Todo produto deve possuir um estoque máximo, no qual, quando chegar neste máximo o gerente deve ser informado. ok
-//4 - Somente o gerente pode atualizar o nível mínimo de estoque de um produto. ok 
-//5 - Somente o gerente pode atualizar o nível máximo de estoque de um produto. ok 
+//1 - Só é permitido a venda de produtos que tem estoque.
+//2 - Todo produto deve possuir um estoque mínimo, no qual, quando chegar neste mínimno o gerente deve ser informado.
+//3 - Todo produto deve possuir um estoque máximo, no qual, quando chegar neste máximo o gerente deve ser informado.
+//4 - Somente o gerente pode atualizar o nível mínimo de estoque de um produto.
+//5 - Somente o gerente pode atualizar o nível máximo de estoque de um produto.
 //6 - A quantidade de um produto não poderá exceder o nível máximo.
 //7 - A quantidade total do estoque de um produto deve estar devidamente atualizada e disponível.
-//8 - Somente o gerente poderá cadastrar um novo produto. ok
-//9 - Somente o gerente poderá remover um novo produto. ok
-//10 - Somente o gerente poderá atualizar o preço de um produto.ok
+//8 - Somente o gerente poderá cadastrar um novo produto.
+//9 - Somente o gerente poderá remover um novo produto.
+//10 - Somente o gerente poderá atualizar o preço de um produto.
 
 void main() {
   test('Só é permitido a venda de produtos que tem estoque.', () {
@@ -145,6 +145,41 @@ void main() {
         "Usuário não pode alterar o produto!");
   });
 
+  
+  test('A quantidade de um produto não poderá exceder o nível máximo.', () {
+    Usuario usuario = Usuario(
+        nome: "Adrieli Santos",
+        email: "adrieli@gmail.com",
+        senha: "1234",
+        cpf: "99999999999",
+        telefone: "44999999999",
+        tipoUsuario: "gerente");
+    ProdutoDao produtoDao = ProdutoDao();
+    Produto produto = Produto(
+        id: 1,
+        nome: 'detergente',
+        quantidadeEstoque: 150,
+        preco: 1.89,
+        quantidadeMinima: 50,
+        quantidadeMaxima: 100);
+    produtoDao.adicionar(produto, usuario);
+    expect(produtoDao.alterar(produto, usuario),
+        "Estoque maior que o limite máximo permitido!");
+  });
+
+  test('A quantidade total do estoque de um produto deve estar devidamente atualizada e disponível.', () {
+    Produto produto = Produto(
+        id: 1,
+        nome: 'detergente',
+        quantidadeEstoque: 50,
+        preco: 1.89,
+        quantidadeMinima: 50,
+        quantidadeMaxima: 100);
+    produtoDao.adicionar(produto, usuario);
+    expect(produtoDao.quantidadeTotalEstoque(),
+        50);
+  });
+
   test('Somente o gerente poderá cadastrar um novo produto.', () {
     Usuario usuario = Usuario(
         nome: "Adrieli Santos",
@@ -205,4 +240,5 @@ void main() {
     expect(produtoDao.alterar(produto, usuario),
         "Usuário não pode alterar o produto!");
   });
+  
 }
