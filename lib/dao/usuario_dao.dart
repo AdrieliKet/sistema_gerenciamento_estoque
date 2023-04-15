@@ -4,13 +4,6 @@ import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
 class UsuarioDao {
   List<Usuario> usuarios = [];
 
-  bool permissaoUsuarioGerenciador(Usuario usuario) {
-    if (usuario.getPermissao() == 'gerenciador') {
-      return true;
-    }
-    return false;
-  }
-
   String adicionar(Usuario usuarioInserir) {
     try {
       var existe = false;

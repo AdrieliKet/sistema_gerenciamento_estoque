@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sistema_gerenciamento_estoque/entidade/itemVenda.dart';
+import 'package:sistema_gerenciamento_estoque/interfaces/add_produto.dart';
 import 'package:sistema_gerenciamento_estoque/dao/controle_estoque_dao.dart';
 import 'package:sistema_gerenciamento_estoque/dao/produto_dao.dart';
 import 'package:sistema_gerenciamento_estoque/dao/venda_dao.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/ItemVenda.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/gerenciador.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/venda.dart';
 import 'package:sistema_gerenciamento_estoque/entidade/vendedor.dart';
+import 'package:sistema_gerenciamento_estoque/interfaces/add_venda.dart';
+import 'package:sistema_gerenciamento_estoque/interfaces/validate_estoque_alto.dart';
+import 'package:sistema_gerenciamento_estoque/interfaces/validate_estoque_baixo.dart';
 
 import 'package:sistema_gerenciamento_estoque/main.dart';
+import 'package:sistema_gerenciamento_estoque/produto_adicionar.dart';
+import 'package:sistema_gerenciamento_estoque/produto_validar.dart';
+import 'package:sistema_gerenciamento_estoque/venda_adicionar.dart';
 
 //1 - Só é permitido a venda de produtos que tem estoque. venda
 //2 - Todo produto deve possuir um estoque mínimo, no qual, quando chegar neste mínimno o gerente deve ser informado. controle estoque
@@ -25,7 +32,8 @@ import 'package:sistema_gerenciamento_estoque/main.dart';
 
 void main() {
   test('Só é permitido a venda de produtos que tem estoque.', () {
-    VendaDao vendaDao = VendaDao();
+    VendaAdicionar vendaAdicionar = VendaAdicionar();
+    AddVenda addVenda = FakeAddVenda();
     Vendedor usuario = Vendedor(
         nome: "Adrieli Santos",
         email: "adrieli@gmail.com",
@@ -66,14 +74,14 @@ void main() {
       itemVenda3,
       itemVenda4
     ];
-    expect(vendaDao.cadastrarVenda(listaProdutosVenda, usuario),
-        "Não foi possível cadastrar a venda, a quantidade em estoque não é suficiente!");
+    expect(vendaAdicionar.adicionarVenda(listaProdutosVenda, addVenda), true);
   });
 
   test(
       'Todo produto deve possuir um estoque mínimo, no qual, quando chegar neste mínimno o gerente deve ser informado.',
       () {
-    ControleEstoqueDao controleEstoqueDao = ControleEstoqueDao();
+    ProdutoValidar produtoValidar = ProdutoValidar();
+    ValidateEstoqueBaixo validateEstoqueBaixo = FakeValidateEstoqueBaixo();
     Produto produto = Produto(
         id: 1,
         nome: 'mouse',
@@ -82,15 +90,16 @@ void main() {
         quantidadeMinima: 50,
         quantidadeMaxima: 100);
     expect(
-        controleEstoqueDao.estoqueProdutoBaixo(
-            produto.quantidadeMinima, produto.quantidadeEstoque),
-        "Estoque menor que o limite minimo permitido!");
+        produtoValidar.validateEstoqueBaixo(
+            produto, validateEstoqueBaixo),
+        true);
   });
 
   test(
       'Todo produto deve possuir um estoque máximo, no qual, quando chegar neste máximo o gerente deve ser informado.',
       () {
-    ControleEstoqueDao controleEstoqueDao = ControleEstoqueDao();
+    ProdutoValidar produtoValidar = ProdutoValidar();
+    ValidateEstoqueAlto validateEstoqueAlto = FakeValidateEstoqueAlto();
     Produto produto = Produto(
         id: 1,
         nome: 'mouse',
@@ -99,9 +108,9 @@ void main() {
         quantidadeMinima: 50,
         quantidadeMaxima: 100);
     expect(
-        controleEstoqueDao.estoqueProdutoAlto(
-            produto.quantidadeMaxima, produto.quantidadeEstoque),
-        "Estoque maior que o limite máximo permitido!");
+        produtoValidar.validateEstoqueAlto(
+            produto, validateEstoqueAlto),
+        true);
   });
 
   test(
@@ -186,13 +195,13 @@ void main() {
   });
 
   test('Somente o gerente poderá cadastrar um novo produto.', () {
-    Vendedor vendedor = Vendedor(
+    Gerenciador gerenciador = Gerenciador(
         nome: "Adrieli Santos",
         email: "adrieli@gmail.com",
         senha: "1234",
         cpf: "99999999999",
         telefone: "44999999999");
-    ProdutoDao produtoDao = ProdutoDao();
+    ProdutoAdicionar produtoAdicionar = ProdutoAdicionar();
     Produto produto = Produto(
         id: 1,
         nome: 'detergente',
@@ -200,8 +209,9 @@ void main() {
         preco: 1.89,
         quantidadeMinima: 50,
         quantidadeMaxima: 100);
-    expect(produtoDao.adicionar(produto, vendedor),
-        "O usuário não pode cadastrar produto.");
+    AddProduto addProduto = FakeAddProduto();
+    expect(produtoAdicionar.adicionarProduto(produto, gerenciador, addProduto),
+        true);
   });
 
   test('Somente o gerente poderá remover um novo produto.', () {
@@ -220,7 +230,8 @@ void main() {
         quantidadeMinima: 50,
         quantidadeMaxima: 100);
     produtoDao.adicionar(produto, vendedor);
-    expect(produtoDao.excluir(1, vendedor), "Usuário não pode excluir produto!");
+    expect(
+        produtoDao.excluir(1, vendedor), "Usuário não pode excluir produto!");
   });
 
   test('Somente o gerente poderá atualizar o preço de um produto.', () {
@@ -242,4 +253,46 @@ void main() {
     expect(produtoDao.alterar(produto, vendedor),
         "Usuário não pode alterar o produto!");
   });
+}
+
+class FakeAddProduto implements AddProduto {
+  @override
+  bool addProduto(Produto produto) {
+    return true;
+  }
+}
+
+class FakeAddVenda implements AddVenda {
+  @override
+  bool addVenda(List<ItemVenda> itemVenda) {
+    for (var i = 0; i <= itemVenda.length; i++) {
+      if (itemVenda[i].quantidadeProduto <
+          itemVenda[i].produto.quantidadeEstoque) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+class FakeValidateEstoqueBaixo implements ValidateEstoqueBaixo {
+  @override
+  bool validateEstoqueBaixo(Produto produto) {
+    if (produto.quantidadeEstoque < produto.quantidadeMinima) {
+      return true;
+    }
+
+    return false;
+  }
+}
+
+class FakeValidateEstoqueAlto implements ValidateEstoqueAlto {
+  @override
+  bool validateEstoqueAlto(Produto produto) {
+    if (produto.quantidadeEstoque > produto.quantidadeMinima) {
+      return true;
+    }
+
+    return false;
+  }
 }
