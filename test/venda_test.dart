@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sistema_gerenciamento_estoque/dao/controle_estoque_dao.dart';
-import 'package:sistema_gerenciamento_estoque/dao/produto_dao.dart';
-import 'package:sistema_gerenciamento_estoque/dao/venda_dao.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/ItemVenda.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/venda.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/vendedor.dart';
-
-import 'package:sistema_gerenciamento_estoque/main.dart';
+import 'package:gerenciador_estoque/entidade/itemVenda.dart';
+import 'package:gerenciador_estoque/entidade/produto.dart';
+import 'package:gerenciador_estoque/interfaces/venda_interface.dart';
+import 'package:gerenciador_estoque/interfaces/venda_interface_implements.dart';
+import 'package:gerenciador_estoque/service/venda_service.dart';
 
 //1 - Só é permitido a venda de produtos que tem estoque. venda
-//2 - Todo produto deve possuir um estoque mínimo, no qual, quando chegar neste mínimno o gerente deve ser informado. controle estoque
-//3 - Todo produto deve possuir um estoque máximo, no qual, quando chegar neste máximo o gerente deve ser informado. controle estoque
-//4 - Somente o gerente pode atualizar o nível mínimo de estoque de um produto. produto
-//5 - Somente o gerente pode atualizar o nível máximo de estoque de um produto. produto
-//6 - A quantidade de um produto não poderá exceder o nível máximo. produto
-//7 - A quantidade total do estoque de um produto deve estar devidamente atualizada e disponível. controle estoque
-//8 - Somente o gerente poderá cadastrar um novo produto.    produto
-//9 - Somente o gerente poderá remover um novo produto. produto
-//10 - Somente o gerente poderá atualizar o preço de um produto. produto
 
 void main() {
   test('Só é permitido a venda de produtos que tem estoque.', () {
-    VendaDao vendaDao = VendaDao();
-    Vendedor vendedor = Vendedor(
-        nome: "Adrieli Santos",
-        email: "adrieli@gmail.com",
-        senha: "1234",
-        cpf: "99999999999",
-        telefone: "44999999999");
+    VendaService vendaService = VendaService();
+    VendaInterface vendaInterface = VendaInterfaceImplements();
     Produto produto1 = Produto(
         nome: "teclado",
         quantidadeEstoque: 100,
@@ -65,8 +46,8 @@ void main() {
       itemVenda3,
       itemVenda4
     ];
-    expect(vendaDao.cadastrarVenda(listaProdutosVenda, vendedor),
-        "Não foi possível cadastrar a venda, a quantidade em estoque não é suficiente!");
+    expect(vendaService.adicionarVenda(listaProdutosVenda, vendaInterface), true);
   });
 
 }
+

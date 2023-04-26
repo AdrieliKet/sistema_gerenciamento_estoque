@@ -1,6 +1,5 @@
-import 'package:sistema_gerenciamento_estoque/entidade/ItemVenda.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/produto.dart';
-import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
+import 'itemVenda.dart';
+import 'usuario.dart';
 
 class Venda {
   dynamic _id;

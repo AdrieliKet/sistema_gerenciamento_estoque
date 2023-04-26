@@ -1,4 +1,4 @@
-import 'package:sistema_gerenciamento_estoque/entidade/usuario.dart';
+import 'package:gerenciador_estoque/entidade/usuario.dart';
 
 class Gerenciador extends Usuario {
   dynamic id;

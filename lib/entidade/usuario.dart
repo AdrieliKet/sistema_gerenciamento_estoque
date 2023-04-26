@@ -19,10 +19,6 @@ class Usuario {
         _cpf = cpf,
         _telefone = telefone;
 
-  String getPermissao() {
-    return "visualizador";
-  }
-
   dynamic get id => _id;
   set id(dynamic value) => _id = value;
 
